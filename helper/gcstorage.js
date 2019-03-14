@@ -1,9 +1,29 @@
 var multer = require("multer");
 var path   = require("path");
 var fs     = require("fs");
+const sharp = require("sharp");
+var Promise = require("promise");
 
 var gcsObj = {};
 
+gcsObj.compressImage = function(file) {
+  // Return promise
+  return new Promise(function(resolve, reject){
+    sharp("./public/" +file)
+    .rotate()
+    .resize(200, 320)
+    .toFile("./public/images/" + file, function(err, data){
+      if(err){
+        reject(err);
+      } else {
+        resolve(data);  // image has been converted.
+      }
+    });
+  });
+}
+
+
+// Add promise
 // Check File Type and Filter it.
 // Check file type
 gcsObj.checkFileType = function(file, cb){
@@ -63,4 +83,19 @@ gcsObj.uploadPic = async function (bucketName, filename) {
   });
 }
 
+
 module.exports = gcsObj;
+
+
+
+// gcsObj.compressImage = function(file) {
+//   console.log("File Dir: ", file);
+//   sharp("./public/" +file)
+//   .rotate()
+//   .resize(200, 320)
+//   .toFile("./public/images/" + file)
+//   .then(function(data){
+//     console.log(data);
+//     return "./public/images/" + file; // resolve for promise
+//   }).catch(err => console.log("Error: ", err));
+// }
